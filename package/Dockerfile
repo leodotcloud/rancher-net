@@ -11,5 +11,6 @@ RUN mkdir -p /opt/cni/bin /etc/cni/net.d && \
     curl -sfSL https://github.com/rancher/rancher-cni-ipam/releases/download/v0.1.0/rancher-cni-ipam.tar.gz | \
     tar xvzf - -C /opt/cni/bin
 
+RUN apt-get update && apt-get install net-tools
 COPY start.sh start-vxlan.sh rancher-net /usr/bin/
 CMD ["start.sh"]

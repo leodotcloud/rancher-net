@@ -198,7 +198,7 @@ func (ms *MetadataStore) doInternalRefresh() {
 
 		if !isPresentInPeersNetworks || c.PrimaryIp == "" ||
 			c.NetworkFromContainerUUID != "" {
-			logrus.Debugf("continuing for c: %+v", c)
+			logrus.Infof("continuing for c: %+v", c)
 			continue
 		}
 
@@ -218,8 +218,10 @@ func (ms *MetadataStore) doInternalRefresh() {
 		entries = append(entries, e)
 	}
 
-	logrus.Debugf("entries: %v", entries)
-	logrus.Debugf("peersMap: %v", peersMap)
+	logrus.Infof("entries: %+v", entries)
+	logrus.Infof("peersMap: %+v", peersMap)
+	logrus.Infof("local: %+v", local)
+	logrus.Infof("remote: %+v", remote)
 
 	ms.entries = entries
 	ms.peersMap = peersMap
