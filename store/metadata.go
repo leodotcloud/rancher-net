@@ -194,7 +194,7 @@ func (ms *MetadataStore) doInternalRefresh() {
 		// check if the container networkUUID is a hit
 		// in the peersNetworks
 
-		_, isPresentInPeersNetworks := peersMap[c.NetworkUUID]
+		_, isPresentInPeersNetworks := peersNetworks[c.NetworkUUID]
 
 		if !isPresentInPeersNetworks || c.PrimaryIp == "" ||
 			c.NetworkFromContainerUUID != "" {
