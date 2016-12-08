@@ -175,6 +175,7 @@ func (ms *MetadataStore) doInternalRefresh() {
 
 	// Figure out the peer containers and networks
 	for _, c := range ms.info.containers {
+		logrus.Debugf("labels: %+v", c.Labels)
 		// TODO: For now match the peer service name
 		if _, ok := c.Labels[networkLabel]; ok {
 			e, _ := ms.getEntryFromContainer(c)
@@ -184,6 +185,9 @@ func (ms *MetadataStore) doInternalRefresh() {
 			peersNetworks[c.NetworkUUID] = true
 		}
 	}
+
+	logrus.Infof("peersMap: %+v", peersMap)
+	logrus.Infof("peersNetworks: %+v", peersNetworks)
 
 	for _, c := range ms.info.containers {
 		// check if the container networkUUID is a hit
