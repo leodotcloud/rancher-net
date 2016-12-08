@@ -178,6 +178,7 @@ func (ms *MetadataStore) doInternalRefresh() {
 		logrus.Debugf("labels: %+v", c.Labels)
 		// TODO: For now match the peer service name
 		if _, ok := c.Labels[networkLabel]; ok {
+			logrus.Infof("Found networkLabel for c: %+v", c)
 			e, _ := ms.getEntryFromContainer(c)
 			e.Peer = true
 			ipNoCidr := strings.Split(e.IpAddress, "/")[0]
