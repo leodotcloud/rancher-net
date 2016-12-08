@@ -193,7 +193,7 @@ func (ms *MetadataStore) doInternalRefresh() {
 
 		if !isPresentInPeersNetworks || c.PrimaryIp == "" ||
 			c.NetworkFromContainerUUID != "" {
-			logrus.Debugf("continuing for c: %+v")
+			logrus.Debugf("continuing for c: %+v", c)
 			continue
 		}
 
