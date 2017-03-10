@@ -41,6 +41,7 @@ type Overlay struct {
 }
 
 func NewOverlay(configDir string, db store.Store) *Overlay {
+	logrus.Debugf("NewOverlay, configDir: %v", configDir)
 	return &Overlay{
 		db: db,
 		templates: Templates{
@@ -52,6 +53,7 @@ func NewOverlay(configDir string, db store.Store) *Overlay {
 }
 
 func (o *Overlay) Start(launch bool, logFile string) {
+	logrus.Debugf("Start, launch: %v, logFile: %v", launch, logFile)
 	if launch {
 		go runCharon(logFile)
 	} else {
@@ -79,6 +81,7 @@ func Test() error {
 }
 
 func (o *Overlay) loadConns() error {
+	logrus.Debugf("loadConns")
 	o.Lock()
 	defer o.Unlock()
 
@@ -87,11 +90,13 @@ func (o *Overlay) loadConns() error {
 		return err
 	}
 	defer client.Close()
+	logrus.Debugf("client=%+v", client)
 
 	conns, err := client.ListConns("")
 	if err != nil {
 		return err
 	}
+	logrus.Debugf("conns=%+v", conns)
 
 	o.hosts = map[string]string{}
 
@@ -103,11 +108,13 @@ func (o *Overlay) loadConns() error {
 			}
 		}
 	}
+	logrus.Debugf("o.hosts: %v", o.hosts)
 
 	return nil
 }
 
 func (o *Overlay) Reload() error {
+	logrus.Debugf("Reload")
 	if err := o.db.Reload(); err != nil {
 		return err
 	}
@@ -122,6 +129,7 @@ func (o *Overlay) Reload() error {
 }
 
 func (o *Overlay) monitorCharon() {
+	logrus.Debugf("start monitoring of charon")
 	pid := ""
 	for {
 		newPidBytes, err := ioutil.ReadFile(pidFile)
@@ -147,6 +155,7 @@ func (o *Overlay) monitorCharon() {
 }
 
 func runCharon(logFile string) {
+	logrus.Debugf("runCharon")
 	// Ignore error
 	os.Remove("/var/run/charon.vici")
 
@@ -210,6 +219,7 @@ func (o *Overlay) configure() error {
 	if err != nil {
 		firstErr = handleErr(firstErr, err, "Failed to list rules for: %v", err)
 	}
+	logrus.Debugf("existingPolicies=%+v", existingPolicies)
 
 	if err := o.loadSharedKey(""); err != nil {
 		firstErr = handleErr(firstErr, err, "Failed to load key for %any: %v", err)
@@ -255,6 +265,7 @@ func (o *Overlay) configure() error {
 }
 
 func (o *Overlay) killCharon(pid string) {
+	logrus.Debugf("killCharon: pid=%v", pid)
 	pidNum, err := strconv.Atoi(pid)
 	if err == nil {
 		err = syscall.Kill(pidNum, syscall.SIGKILL)
@@ -266,6 +277,7 @@ func (o *Overlay) killCharon(pid string) {
 }
 
 func (o *Overlay) deletePolicies(policies map[string]netlink.XfrmPolicy) error {
+	logrus.Debugf("deletePolicies: %+v", policies)
 	var lastErr error
 	for _, policy := range policies {
 		if err := netlink.XfrmPolicyDel(&policy); err != nil {
@@ -279,6 +291,7 @@ func (o *Overlay) deletePolicies(policies map[string]netlink.XfrmPolicy) error {
 }
 
 func (o *Overlay) addPolicies(policies map[string]netlink.XfrmPolicy) error {
+	logrus.Debugf("addPolicies: %+v", policies)
 	var lastErr error
 	for _, policy := range policies {
 		if err := netlink.XfrmPolicyAdd(&policy); err != nil {
@@ -318,6 +331,7 @@ func (o *Overlay) removeHosts() error {
 			} else {
 				logrus.Infof("Removed connection for %s", k)
 				delete(o.hosts, k)
+
 			}
 		}
 	}
@@ -326,6 +340,7 @@ func (o *Overlay) removeHosts() error {
 }
 
 func (o *Overlay) removeHost(host string) error {
+	logrus.Debugf("removeHost: %v", host)
 	client, err := getClient()
 	if err != nil {
 		return err
@@ -366,6 +381,7 @@ func (o *Overlay) addHost(entry store.Entry) error {
 }
 
 func (o *Overlay) loadSharedKey(ipAddress string) error {
+	logrus.Debugf("loadSharedKey: ipAddress=%v", ipAddress)
 	ipAddress = strings.Split(ipAddress, "/")[0]
 	key := o.getPsk(ipAddress)
 
@@ -417,6 +433,7 @@ func (o *Overlay) filterAlgos(algos []string) []string {
 }
 
 func (o *Overlay) addHostConnection(entry store.Entry) error {
+	logrus.Debugf("addHostConnection entry=%+v", entry)
 	o.hostAttempt[entry.HostIpAddress] = true
 	if o.hosts[entry.HostIpAddress] == o.templates.Revision() {
 		logrus.Debugf("Connection already loaded for host %s", entry.HostIpAddress)
@@ -435,6 +452,7 @@ func (o *Overlay) addHostConnection(entry store.Entry) error {
 	if strings.Compare(entry.HostIpAddress, o.db.LocalHostIpAddress()) < 0 {
 		childSAConf.RekeyTime = "8760h"
 	}
+	logrus.Debugf("childSAConf: %+v", childSAConf)
 
 	ikeConf := o.templates.NewIkeConf()
 	ikeConf.Proposals = o.filterAlgos(ikeConf.Proposals)
@@ -442,6 +460,7 @@ func (o *Overlay) addHostConnection(entry store.Entry) error {
 	ikeConf.Children = map[string]goStrongswanVici.ChildSAConf{
 		"child-" + entry.HostIpAddress: childSAConf,
 	}
+	logrus.Debugf("ikeConf: %+v", ikeConf)
 
 	name := fmt.Sprintf("conn-%s", entry.HostIpAddress)
 	// Loading connections doesn't seem to be very reliable, can't get info
@@ -547,6 +566,10 @@ func (o *Overlay) addRules(entry store.Entry, existingPolicies map[string]netlin
 			},
 		},
 	}
+
+	logrus.Debugf("outPolicy: %+v", outPolicy)
+	logrus.Debugf("inPolicy: %+v", inPolicy)
+	logrus.Debugf("fwdPolicy: %+v", fwdPolicy)
 
 	var lastErr error
 	for _, policy := range []netlink.XfrmPolicy{outPolicy, inPolicy, fwdPolicy} {

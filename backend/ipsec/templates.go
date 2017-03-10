@@ -48,6 +48,7 @@ type Templates struct {
 }
 
 func (t *Templates) Reload() error {
+	logrus.Debugf("templates: Reload")
 	var err error
 	t.ikeConfTemplate, err = t.loadBytes(ikeConfName, defaultIkeConf)
 	if err != nil {
@@ -71,6 +72,10 @@ func (t *Templates) Reload() error {
 	digest.Write(t.ikeConfTemplate)
 	digest.Write(t.childSaConfTemplate)
 	t.revision = hex.EncodeToString(digest.Sum(nil))
+
+	logrus.Debugf("t.ikeConfTemplate: %v", string(t.ikeConfTemplate))
+	logrus.Debugf("t.childSaConfTemplate: %v", string(t.childSaConfTemplate))
+	logrus.Debugf("t.revision: %v", t.revision)
 
 	return nil
 }
