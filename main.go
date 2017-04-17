@@ -78,6 +78,12 @@ func main() {
 			Usage:  "backend to use: ipsec/vxlan",
 			EnvVar: "RANCHER_NET_BACKEND",
 		},
+		cli.StringFlag{
+			Name:   "ipsec-rekey-interval",
+			Value:  "4h",
+			Usage:  "backend to use: ipsec/vxlan",
+			EnvVar: "RANCHER_NET_IPSEC_REKEY_INTERVAL",
+		},
 		cli.BoolFlag{
 			Name:   metadataFlag,
 			Usage:  "Use metadata instead of config file",
