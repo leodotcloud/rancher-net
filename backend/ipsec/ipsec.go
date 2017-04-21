@@ -20,6 +20,9 @@ import (
 	"github.com/vishvananda/netlink"
 )
 
+// IPSecRekeyInterval ...
+var IPSecRekeyInterval = "4h"
+
 const (
 	reqId    = 1234
 	reqIdStr = "1234"
@@ -432,9 +435,11 @@ func (o *Overlay) addHostConnection(entry store.Entry) error {
 	childSAConf := o.templates.NewChildSaConf()
 	childSAConf.ESPProposals = o.filterAlgos(childSAConf.ESPProposals)
 	childSAConf.ReqID = reqIdStr
+	childSAConf.RekeyTime = IPSecRekeyInterval
 	if strings.Compare(entry.HostIpAddress, o.db.LocalHostIpAddress()) < 0 {
 		childSAConf.RekeyTime = "8760h"
 	}
+	logrus.Infof("For entry: %v, using RekeyTime: %v", entry, childSAConf.RekeyTime)
 
 	ikeConf := o.templates.NewIkeConf()
 	ikeConf.Proposals = o.filterAlgos(ikeConf.Proposals)

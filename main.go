@@ -171,6 +171,7 @@ func appMain(ctx *cli.Context) error {
 		overlay, _ = vxlan.NewOverlay("", db)
 		overlay.Start(true, "")
 	} else {
+		ipsec.IPSecRekeyInterval = ctx.GlobalString("ipsec-rekey-interval")
 		ipsecOverlay := ipsec.NewOverlay(ctx.GlobalString("ipsec-config"), db)
 		if !ctx.GlobalBool("gcm") {
 			ipsecOverlay.Blacklist = []string{"aes128gcm16"}
