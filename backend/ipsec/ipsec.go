@@ -442,6 +442,10 @@ func (o *Overlay) addHostConnection(entry store.Entry) error {
 	logrus.Infof("For entry: %v, using RekeyTime: %v", entry, childSAConf.RekeyTime)
 
 	ikeConf := o.templates.NewIkeConf()
+	ikeConf.RekeyTime = IPSecRekeyInterval
+	if strings.Compare(entry.HostIpAddress, o.db.LocalHostIpAddress()) < 0 {
+		ikeConf.RekeyTime = "8760h"
+	}
 	ikeConf.Proposals = o.filterAlgos(ikeConf.Proposals)
 	ikeConf.RemoteAddrs = []string{entry.HostIpAddress}
 	ikeConf.Children = map[string]goStrongswanVici.ChildSAConf{

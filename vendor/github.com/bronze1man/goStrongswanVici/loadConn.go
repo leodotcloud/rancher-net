@@ -15,7 +15,8 @@ type IKEConf struct {
 	Version     string   `json:"version"`   //1 for ikev1, 0 for ikev1 & ikev2
 	Encap       string   `json:"encap"`     //yes,no
 	KeyingTries string   `json:"keyingtries"`
-	//	RekyTime   string                 `json:"rekey_time"`
+	// Enabling RekeyTime for IKEConf as well
+	RekeyTime  string                 `json:"rekey_time"`
 	LocalAuth  AuthConf               `json:"local"`
 	RemoteAuth AuthConf               `json:"remote"`
 	Children   map[string]ChildSAConf `json:"children"`
