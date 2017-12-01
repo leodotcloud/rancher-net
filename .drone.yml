@@ -12,6 +12,8 @@ pipeline:
     volumes:
     - /var/run/docker.sock:/var/run/docker.sock
     commands:
-    - scripts/docker_push
+    - pwd
+    - ls -lR
+    - sh scripts/docker_push
     when:
       event: tag
