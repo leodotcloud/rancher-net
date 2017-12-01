@@ -8,9 +8,11 @@ pipeline:
     commands:
     - dapper ci
   docker:
-    image: plugins/docker
-    repo: $$DRONE_REPO_OWNER/net
-    tags:
-      - $$DRONE_TAG
+    image: rancher/dapper:1.12.1
+    volumes:
+    - /var/run/docker.sock:/var/run/docker.sock
+    commands:
+    - pwd
+    - sh -x /go/src/github.com/rancher/rancher-net/scripts/docker_push
     when:
       event: tag
