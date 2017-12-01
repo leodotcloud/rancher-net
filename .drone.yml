@@ -9,6 +9,7 @@ pipeline:
     - dapper ci
   docker_push:
     image: rancher/dapper:1.12.1
+    secrets: [ docker_username, docker_password ]
     volumes:
     - /var/run/docker.sock:/var/run/docker.sock
     commands:
