@@ -1,6 +1,5 @@
-#!/bin/bash -xe
+#!/bin/bash -e
 
-set +x
 if [[ -z "${DOCKER_USERNAME}" || -z "${DOCKER_PASSWORD}" ]]; then
     echo "error: both docker username and password are required"
     exit 1
@@ -11,9 +10,6 @@ if [[ $? -ne 0 ]]; then
     echo "error: incorrect login credentials"
     exit 1
 fi
-set -x
-
-pwd
 
 docker push `cat dist/images`
 if [[ $? -ne 0 ]]; then
