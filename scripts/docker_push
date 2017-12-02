@@ -11,8 +11,11 @@ if [[ $? -ne 0 ]]; then
     exit 1
 fi
 
-docker push `cat dist/images`
+IMAGE_NAME=`cat dist/images`
+docker push ${IMAGE_NAME}
 if [[ $? -ne 0 ]]; then
     echo "error: unable to push image to dockerhub"
     exit 1
 fi
+
+echo "Successfully pushed image: ${IMAGE_NAME} to dockerhub"
